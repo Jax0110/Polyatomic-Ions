@@ -1,0 +1,50 @@
+function generateRandomArray(length) {
+    if (length <= 0) throw new Error("Array length must be greater than 0.");
+    
+    let array = Array.from({ length }, (_, i) => i);
+    
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    return array;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const ions = ["Ammonium", "Acetate", "Cyanide", "Hydroxide", "Hypochlorite", "Chlorite", "Chlorate", "Perchlorate", "Carbonate", "Bicarbonate", "Dichromate", "Chromate", "Permanganate", "Nitrite", "Nitrate", "Phosphate", "Hydrogen Phosphate", "Dihydrogen Phosphate", "Sulfite", "Sulfate", "Bisulfite", "Bisulfate"];
+    const formulas = ["NH4+", "C2H3O2-", "CN-", "OH-", "ClO-", "ClO2-", "ClO3-", "ClO4-", "CO3^2-", "HCO3-", "Cr2O7^2-", "CrO4^2-", "MnO4-", "NO2-", "NO3-", "PO4^3-", "HPO4^2-", "H2PO4-", "SO3^2-", "SO4^2-", "HSO3-", "HSO4-"];
+    const randomizedIndices = generateRandomArray(ions.length);
+
+    let score = 0;
+    let incorrect = [];
+    const quizContainer = document.getElementById('quiz-container');
+    const resultContainer = document.getElementById('result-container');
+
+    randomizedIndices.forEach((index, idx) => {
+        const question = document.createElement('div');
+        question.innerHTML = `
+            <p>${idx + 1}. ${ions[index]}</p>
+            <input type="text" id="answer-${index}" placeholder="Enter the formula">
+        `;
+        quizContainer.appendChild(question);
+    });
+
+    document.getElementById('submit-btn').addEventListener('click', () => {
+        randomizedIndices.forEach(index => {
+            const userInput = document.getElementById(`answer-${index}`).value;
+            if (userInput === formulas[index]) {
+                score++;
+            } else {
+                incorrect.push(`${ions[index]} (${formulas[index]})`);
+            }
+        });
+
+        resultContainer.innerHTML = `
+            <p>You answered ${score}/${ions.length} correctly.</p>
+            <p>Accuracy: ${(score / ions.length * 100).toFixed(2)}%</p>
+            ${incorrect.length > 0 ? `<p>Incorrect answers: <ul>${incorrect.map(item => `<li>${item}</li>`).join('')}</ul></p>` : `<p>Congratulations! You got all answers correct!</p>`}
+        `;
+        quizContainer.style.display = 'none';
+    });
+});
